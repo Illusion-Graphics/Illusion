@@ -31,4 +31,4 @@ jobs:
     - uses: actions/upload-artifact@v1
       with:
           name: Top
-          path: Hardware/build/Illusion_System_Top_1.0/ims-verilator/*.png
+          path: Hardware/build/Illusion_System_Top_1.0/sim-verilator/*.png
