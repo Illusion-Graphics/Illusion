@@ -1,0 +1,17 @@
+CAPI=2:
+
+name: Illusion:Illusion:Illusion:1.0
+description: Top level file for the Illusion GPU
+
+filesets:
+  rtl:
+    depend:
+      - ">=Illusion:Illusion:Rasterizer:1.0"
+      - ">=Illusion:System:Memory:1.0"
+    files:
+      - Illusion.sv : {file_type : systemVerilogSource}
+      - TriangleAABB.sv : {file_type : systemVerilogSource}
+      
+targets:
+  default:
+    filesets: [rtl]

@@ -1,0 +1,13 @@
+CAPI=2:
+
+name: Illusion:System:Memory:1.0
+description: Simple double access memory, one read and one write
+
+filesets:
+  rtl:
+    files:
+      - Memory.sv : {file_type : systemVerilogSource}
+      
+targets:
+  default:
+    filesets: [rtl]

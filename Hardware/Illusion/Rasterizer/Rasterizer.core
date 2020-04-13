@@ -1,0 +1,28 @@
+CAPI=2:
+
+name: Illusion:Illusion:Rasterizer:1.0
+description: Simple rasterizer
+
+filesets:
+  rtl:
+    files:
+      - Rasterizer.sv : {file_type : systemVerilogSource}
+  
+  test:
+    files:
+      - Test/Rasterizer.cpp  : {file_type : cppSource}
+      - Test/stb_image_write.h  : {file_type : cppSource, is_include_file: true }
+      
+targets:
+  default:
+    filesets: [rtl]
+
+  sim:
+    default_tool: verilator
+    filesets: [rtl, test]
+    toplevel: [Rasterizer]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - "--trace"

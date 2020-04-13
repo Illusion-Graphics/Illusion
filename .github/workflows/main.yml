@@ -1,0 +1,34 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Install verilator
+      run: sudo apt-get install verilator
+
+    - name: Install fusesoc
+      run: |
+        sudo pip install fusesoc
+        fusesoc init -y
+        
+    - name: Setup project
+      run: |
+        cd Hardware
+        fusesoc library add Illusion .
+        
+    - name: Simulate top
+      run: |
+        cd Hardware
+        fusesoc run --target=sim Illusion:System:Top:1.0
+
+    - uses: actions/upload-artifact@v1
+      with:
+          name: Top
+          path: Hardware/build/Illusion_System_Top_1.0/ims-verilator/*.png

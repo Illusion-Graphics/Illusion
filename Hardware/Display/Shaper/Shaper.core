@@ -1,0 +1,14 @@
+CAPI=2:
+
+name: Illusion:Display:Shaper:1.0
+description: The shaper core is resposible for coordinates generation, scaling, depalletization
+
+filesets:
+  rtl:
+    files:
+      - Shaper.sv : {file_type : systemVerilogSource}
+      - Depalettizer.sv : {file_type : systemVerilogSource}
+      
+targets:
+  default:
+    filesets: [rtl]

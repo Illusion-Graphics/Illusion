@@ -1,0 +1,13 @@
+CAPI=2:
+
+name: Illusion:Display:VideoSignalGenerator:1.0
+description: Video signal generator
+
+filesets:
+  rtl:
+    files:
+      - VideoSignalGenerator.sv : {file_type : systemVerilogSource}
+      
+targets:
+  default:
+    filesets: [rtl]
