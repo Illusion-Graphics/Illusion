@@ -1,13 +1,13 @@
 CAPI=2:
 
-name: Illusion:System:Memory:1.0
-description: Simple double access memory, one read and one write
+name: Illusion:System:Memory:1.1
+description: Set of memory blocks
 
 filesets:
-  rtl:
+  RAM_1R_1W:
     files:
-      - Memory.sv : {file_type : systemVerilogSource}
+      - RAM_1R_1W.sv : {file_type : systemVerilogSource}
       
 targets:
   default:
-    filesets: [rtl]
+    filesets: [RAM_1R_1W]

@@ -1,0 +1,16 @@
+CAPI=2:
+
+name: Illusion:Tests:Tests:1.0
+description: Unit test framework
+
+filesets:
+  unit_test:
+    files:
+      - TestRunner.h : {file_type : cppSource, is_include_file: true}
+  test_bench:
+    files:
+      - TestBench.h : {file_type : cppSource, is_include_file: true}
+
+targets:
+  default:
+    filesets: [unit_test, test_bench]
