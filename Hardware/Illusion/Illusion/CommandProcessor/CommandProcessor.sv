@@ -14,11 +14,14 @@ module CommandProcessor
 
 	input logic aCommandRequested,
 	output CommandOperands anOutCommand,
-	output logic [15:0] anOutCommandData
+	output logic [15:0] anOutCommandData,
+	output logic anOutReady
 );
 
 typedef enum  {IDLE, FETCHING, EXECUTING} State;
 State state;
+
+assign anOutReady = (state == EXECUTING);
 
 wire fetcherReady;
 CommandFetcher commandFetcher
@@ -46,41 +49,45 @@ wire commandRead;
 
 initial begin
 	state = IDLE;
-	commandPointer = -1;
+	commandPointer = 0;
 end
+
+assign anOutCommand = CommandOperands'(command[31:16]);
+assign anOutCommandData = command[15:0];
+assign commandRead = aCommandRequested;
 
 always_ff @(posedge aClock)
 begin
+	if (aReset || commandPointer == 62) begin
+		state <= IDLE;
+	end
+
 	case (state)
 		IDLE: begin
-			commandPointer <= -1;
-			commandRead <= 0;
+			commandPointer <= 0;
+			// commandRead <= 0;
 
 			if (anExecute) begin
 				state <= FETCHING;
 			end
 		end
 		FETCHING: begin
-			if(fetcherReady) begin
+			if (fetcherReady) begin
 				state <= EXECUTING;
 			end
 		end
 		EXECUTING: begin
 			if (aCommandRequested) begin
-				commandRead <= 1;
+				// commandRead <= 1;
 				commandPointer <= commandPointer + 1;
 				case (CommandOperands'(command[31:16]))
 					COMMAND_OP_END: begin
 						state <= IDLE;
 					end
-					default: begin
-						anOutCommand <= CommandOperands'(command[31:16]);
-						anOutCommandData <= command[15:0];
-					end
 				endcase
 			end
 			else begin
-				commandRead <= 0;
+				// commandRead <= 0;
 			end
 		end
 	endcase

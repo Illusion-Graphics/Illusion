@@ -16,6 +16,9 @@ begin
 	palette[2] = 24'hff0000; // 2: Red
 	palette[3] = 24'h00ff00; // 3: Green
 	palette[4] = 24'h0000ff; // 4: Blue
+	palette[5] = 24'hffff00; // 5: Yellow
+	palette[6] = 24'h00ffff; // 6: Cyan
+	palette[7] = 24'hff00ff; // 7: Magenta
 end
 
 assign anOutRed = palette[aPalleteID][23:16];

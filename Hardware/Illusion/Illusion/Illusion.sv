@@ -6,18 +6,51 @@ module Illusion
 	input logic aFrameFlipped,
 	output logic anOutFrameDone,
 
+	// To framebuffer memory
 	output logic [31:0] anOutPixelAddr,
-	output logic [2:0] anOutPixelData
+	output logic [2:0] anOutPixelData,
+	output logic anOutPixelWrite,
+
+	// To central memory
+	output logic [MAIN_MEMORY_BUS_ADDR_WIDTH - 1:0] anOutMemoryAddr,
+	input logic [MAIN_MEMORY_BUS_DEPTH - 1:0] aMemoryData,
+	output logic anOutMemoryEnable
 );
 
 localparam RENDERING_WIDTH = 320;
 localparam RENDERING_HEIGHT = 240;
 
-typedef enum {IDLE, GENERATE_TRIANGLE_AABB, PREPARE_RASTERIZE, RASTERIZE} States;
+typedef enum {IDLE, WAITING_COMMAND_PROCESSOR, EXECUTING_COMMAND, GENERATE_TRIANGLE_AABB, PREPARE_RASTERIZE, RASTERIZE, CLEAR_COLOR} States;
 States state;
 
 reg [10:0] x;
 reg [10:0] y;
+
+wire commandRequested;
+wire [15:0] command;
+wire [15:0] commandData;
+wire commandProcessorReady;
+
+wire executeCommandList;
+
+CommandProcessor commandProcessor
+(
+	.aClock(aClock),
+	.aReset(aReset),
+
+	.aCommandPointer(0),
+	.anExecute(executeCommandList),
+
+	.anOutMemoryAddr(anOutMemoryAddr),
+	.aMemoryData(aMemoryData),
+	.anOutMemoryEnable(anOutMemoryEnable),
+
+	.aCommandRequested(commandRequested),
+	.anOutCommand(command),
+	.anOutCommandData(commandData),
+	.anOutReady(commandProcessorReady)
+);
+
 
 initial
 begin
@@ -53,7 +86,6 @@ begin
 	triangleCache[12] = 225;
 end
 
-wire rasterizerOutput;
 
 /* verilator lint_off WIDTH */
 assign anOutPixelAddr = x + (y * RENDERING_WIDTH);
@@ -102,6 +134,10 @@ assign triangleMin[1] = triangleCache[AABB_DATA_ADDR + triangleCounter * AABB_SI
 assign triangleMax[0] = triangleCache[AABB_DATA_ADDR + triangleCounter * AABB_SIZE + 2];
 assign triangleMax[1] = triangleCache[AABB_DATA_ADDR + triangleCounter * AABB_SIZE + 3];
 
+wire rasterizerOutput;
+wire writePixel;
+reg [2:0] pixelOut;
+
 Rasterizer rasterizer_inst
 (
 	.aX(x),
@@ -109,13 +145,19 @@ Rasterizer rasterizer_inst
 	.aPoint1(point1),
 	.aPoint2(point2),
 	.aPoint3(point3),
-	.anOutInside(anOutPixelData[1])
+	.anOutInside(rasterizerOutput)
 );
+
+assign anOutPixelWrite = (state == RASTERIZE ? rasterizerOutput : writePixel);
+assign anOutPixelData = (state == RASTERIZE ? 2 : pixelOut);
 
 reg [10:0] triangleCounter;
 
+assign commandRequested = (state == EXECUTING_COMMAND);
+
 always @(posedge aClock)
 begin
+	writePixel <= 1;
 
 	if(aFrameFlipped) begin
 		anOutFrameDone = 0;
@@ -133,8 +175,35 @@ begin
 				y = 0;
 				triangleCounter = 0;
 
-				if(!anOutFrameDone) begin
-					state = GENERATE_TRIANGLE_AABB;
+				if (!anOutFrameDone) begin
+					state = WAITING_COMMAND_PROCESSOR;
+					executeCommandList <= 1;
+				end
+			end
+
+			WAITING_COMMAND_PROCESSOR: begin
+				executeCommandList <= 0;
+
+				if (commandProcessorReady) begin
+					state = EXECUTING_COMMAND;
+				end
+			end
+
+			EXECUTING_COMMAND: begin
+				if (!commandProcessorReady) begin
+					anOutFrameDone = 1;
+					state = IDLE;
+				end
+				else begin
+					case (command)
+						16'h0001: begin
+							state = CLEAR_COLOR;
+							pixelOut <= commandData[15:13];
+						end
+						16'h0002: begin
+							state = GENERATE_TRIANGLE_AABB;
+						end
+					endcase
 				end
 			end
 
@@ -178,10 +247,28 @@ begin
 					end
 				end
 				else begin
-					anOutFrameDone = 1;
-					state = IDLE;
+					state = EXECUTING_COMMAND;
 				end
 			end
+
+			CLEAR_COLOR: begin
+				writePixel <= 1;
+				if(x == RENDERING_WIDTH) begin
+					x = 0;
+
+					if(y == RENDERING_HEIGHT) begin
+						y = 0;
+						state = EXECUTING_COMMAND;
+					end
+					else begin
+						y = y + 1;
+					end
+				end
+				else begin
+					x = x + 1;
+				end
+			end
+
 		endcase
 	end
 end

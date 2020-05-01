@@ -33,6 +33,7 @@ reg frameFlipped;
 
 wire [31:0] pixelAddress;
 wire [2:0] pixelData;
+wire pixelWrite;
 
 Illusion illusion_inst
 (
@@ -41,7 +42,34 @@ Illusion illusion_inst
 	.aFrameFlipped(frameFlipped),
 	.anOutFrameDone(frameDone),
 	.anOutPixelAddr(pixelAddress),
-	.anOutPixelData(pixelData)
+	.anOutPixelData(pixelData),
+	.anOutPixelWrite(pixelWrite),
+	.anOutMemoryAddr(mainMemoryAddr),
+	.aMemoryData(mainMemoryData),
+	.anOutMemoryEnable(mainMemoryRead)
+);
+
+wire mainMemoryRead;
+wire [31:0] mainMemoryData;
+wire [63:0] mainMemoryAddr;
+
+RAM_1R_1W
+#(
+	.DEPTH(32),
+	.SIZE(256)
+)
+mainMemory
+(
+	.aClock(aClock),
+	// Disable linter since the interface is likely to change to access the SDRAM
+	/* verilator lint_off WIDTH */
+	.aReadAddress(mainMemoryAddr),
+	/* verilator lint_on WIDTH */
+	.anOutReadData(mainMemoryData),
+	.aReadEnable(mainMemoryRead),
+	.aWriteAddress(),
+	.aWriteData(),
+	.aWriteEnable()
 );
 
 VideoSignalGenerator videoSignalGenerator_inst
@@ -96,7 +124,7 @@ framebuffer_inst
 	.aReadEnable(1),
 	.aWriteAddress(framebufferAddr[17:0] + pixelAddress[17:0]),
 	.aWriteData(pixelData),
-	.aWriteEnable(!frameDone)
+	.aWriteEnable(!frameDone && pixelWrite)
 );
 
 always @(posedge aClock)

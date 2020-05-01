@@ -62,6 +62,9 @@ initial begin
 	commandCounter = 0;
 end
 
+assign anOutMemoryEnable = state == FETCH;
+assign bufferWrite = state == FETCH;
+
 always_ff @(posedge aClock)
 begin
 	case (state)
@@ -77,8 +80,6 @@ begin
 			end
 		end
 		FETCH: begin
-			anOutMemoryEnable <= 1;
-			bufferWrite <= 1;
 			commandCounter <= commandCounter + 1;
 
 			if(commandCounter == 63) begin

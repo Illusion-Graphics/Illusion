@@ -27,9 +27,12 @@ public:
 	bool Update(const uint aStep)
 	{
 		myCurrentStep += aStep;
-		if(myCurrentStep >= myStep - myDelta)
+		if (myCurrentStep >= (myStep - myDelta))
 		{
 			myCurrentStep = 0;
+		}
+		else if(myCurrentStep >= ((myStep / 2) - myDelta))
+		{
 			return true;
 		}
 		return false;
@@ -37,7 +40,7 @@ public:
 	
 	uint GetNextClock() const
 	{
-		return myStep - myCurrentStep;
+		return std::min(myStep - myCurrentStep, myStep / 2);
 	}
 
 private:
@@ -58,8 +61,8 @@ int main(int argc, char** argv)
 	char* data = new char[byteSize];
 	memset(data, 0x00, byteSize);
 
-	Clock clock48(48000);
-	Clock clock25(25000);
+	Clock clock48(120000000);
+	Clock clock25(24000000);
 
 	// Screen screen(640, 480);
 
@@ -69,6 +72,12 @@ int main(int argc, char** argv)
 	VerilatedVcdC* trace = new VerilatedVcdC();
 	tb->trace(trace, 99);
 	trace->open("trace.vcd");
+
+	tb->Top__DOT__mainMemory__DOT__mem[0] = 0x0001C000;
+	tb->Top__DOT__mainMemory__DOT__mem[2] = 0x00020000;
+	// tb->Top__DOT__mainMemory__DOT__mem[2] = 0x0001C000;
+	// tb->Top__DOT__mainMemory__DOT__mem[3] = 0x0001C000;
+	tb->Top__DOT__mainMemory__DOT__mem[4] = 0xFFFF0000;
 
 	// tb->Top__DOT__framebuffer_inst__DOT__mem[0] = 2;
 	// tb->Top__DOT__framebuffer_inst__DOT__mem[76799] = 4;
@@ -84,22 +93,22 @@ int main(int argc, char** argv)
 
 
 
+	bool frameFlipped = false;
+
 	while(frameCounter < 2)
 	{
+		trace->dump(static_cast<uint64_t>(i));
 		double step = std::min(clock48.GetNextClock(), clock25.GetNextClock());
 		i += step;
+
 		bool updateClock[2];
 		updateClock[0] = clock48.Update(step);
 		updateClock[1] = clock25.Update(step);
 
-		tb->aClock = clock48.Update(step);
-		tb->aPixelClock = clock48.Update(step);
-		tb->eval();
-		tb->aClock  = 0;
-		tb->aPixelClock = 0;
+		tb->aClock = updateClock[0];
+		tb->aPixelClock = updateClock[1];
 		tb->eval();
 
-		trace->dump(i/10e3);
 		if(tb->anOutDisplayEnabled)
 		{
 			data[(tb->anOutX + tb->anOutY * 640) * 3 + 0] = tb->anOutRed;
@@ -114,7 +123,7 @@ int main(int argc, char** argv)
 		// signals.myRGB[1] = tb->anOutGreen;
 		// signals.myRGB[2] = tb->anOutBlue;
 		// screen.Update(signals);
-		if(tb->Top__DOT__frameFlipped)
+		if(tb->Top__DOT__frameFlipped && !frameFlipped)
 		{
 			printf("Frame flipped!\n");
 			char filename[256];
@@ -122,6 +131,11 @@ int main(int argc, char** argv)
 
 			frameCounter++;
 			stbi_write_png(filename, 640, 480, 3, data, 640 * 3);
+			frameFlipped = true;
+		}
+		else if(frameFlipped && !updateClock[0])
+		{
+			frameFlipped = false;
 		}
 	}
 	trace->close();

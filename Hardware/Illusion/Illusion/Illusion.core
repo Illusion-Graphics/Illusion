@@ -11,7 +11,7 @@ filesets:
   rtl:
     depend:
       - ">=Illusion:Illusion:Rasterizer:1.0"
-      - ">=Illusion:System:Memory:1.0"
+      - ">=Illusion:System:Memory:1.1"
     files:
       - Illusion.sv : {file_type : systemVerilogSource}
       - TriangleAABB.sv : {file_type : systemVerilogSource}
@@ -28,8 +28,6 @@ filesets:
       - Tests/CommandProcessor/CommandFetcher.cpp  : {file_type : cppSource}
 
   command_processor:
-    depend:
-      - ">=Illusion:System:Memory:1.1"
     files:
       - CommandProcessor/CommandProcessor.sv : {file_type : systemVerilogSource}
   test_command_processor:
@@ -42,7 +40,7 @@ filesets:
       
 targets:
   default:
-    filesets: [rtl]
+    filesets: [defines, rtl, command_processor, command_fetcher]
 
   sim_command_fetcher:
     default_tool: verilator
