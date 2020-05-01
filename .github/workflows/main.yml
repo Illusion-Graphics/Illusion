@@ -23,12 +23,12 @@ jobs:
         cd Hardware
         fusesoc library add Illusion .
         
-    - name: Simulate top
+    - name: Simulate Command Fetcher
       run: |
         cd Hardware
-        fusesoc run --target=sim Illusion:System:Top:1.0
+        fusesoc run --target sim_command_fetcher Illusion:Illusion:Illusion:1.2
 
-    - uses: actions/upload-artifact@v1
-      with:
-          name: Top
-          path: Hardware/build/Illusion_System_Top_1.0/sim-verilator/*.png
+    - name: Simulate Command Processor
+      run: |
+        cd Hardware
+        fusesoc run --target sim_command_processor Illusion:Illusion:Illusion:1.2
