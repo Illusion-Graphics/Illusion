@@ -32,3 +32,8 @@ jobs:
       run: |
         cd Hardware
         fusesoc run --target sim_command_processor Illusion:Illusion:Illusion:1.2
+
+    - name: Simulate Top
+      run: |
+        cd Hardware
+        fusesoc run --target sim Illusion:System:Top:1.0
