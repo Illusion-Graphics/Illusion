@@ -1,3 +1,3 @@
 # Illusion
 
-[Documentation](https://lord-nazdar.gitbook.io/illusion-gpu/)
+![](https://github.com/Illusion-Graphics/Illusion/workflows/CI/badge.svg)
