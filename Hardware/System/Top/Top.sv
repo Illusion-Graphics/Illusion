@@ -8,25 +8,23 @@ module Top
 	// Display signals
 	output logic anOutHorizontalSync,
 	output logic anOutVerticalSync,
+	output logic anOutDisplayEnabled,
 	output logic [7:0] anOutRed,
 	output logic [7:0] anOutGreen,
 	output logic [7:0] anOutBlue,
 
 `ifdef IMMEDIATE_OUTPUT
 	output logic [9:0] anOutX,
-	output logic [9:0] anOutY,
-	output logic anOutDisplayEnabled
+	output logic [9:0] anOutY
 `endif // IMMEDIATE_OUTPUT
 );
 
-wire displayEnabled;
 wire [9:0] x;
 wire [9:0] y;
 
 `ifdef IMMEDIATE_OUTPUT
 	assign anOutX = x;
 	assign anOutY = y;
-	assign anOutDisplayEnabled = displayEnabled;
 `endif // IMMEDIATE_OUTPUT
 
 
@@ -52,7 +50,7 @@ VideoSignalGenerator videoSignalGenerator_inst
 	.aReset(aReset),
 	.anOutHorizontalSync(anOutHorizontalSync),
 	.anOutVerticalSync(anOutVerticalSync),
-	.anOutDisplayEnabled(displayEnabled),
+	.anOutDisplayEnabled(anOutDisplayEnabled),
 	.anOutX(x),
 	.anOutY(y)
 );
@@ -85,7 +83,7 @@ reg currentFramebuffer;
 wire [31:0] framebufferAddr = currentFramebuffer ? framebuffer1Addr : framebuffer2Addr;
 wire [31:0] readFramebufferAddr = (~currentFramebuffer) ? framebuffer1Addr : framebuffer2Addr;
 
-Memory
+RAM_1R_1W
 #(
 	.DEPTH(3),
 	.SIZE(76800 * 2) // 320*240
@@ -95,6 +93,7 @@ framebuffer_inst
 	.aClock(aClock),
 	.aReadAddress(framebufferReadAddress),
 	.anOutReadData(frameBufferData),
+	.aReadEnable(1),
 	.aWriteAddress(framebufferAddr[17:0] + pixelAddress[17:0]),
 	.aWriteData(pixelData),
 	.aWriteEnable(!frameDone)
