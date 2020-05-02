@@ -87,6 +87,7 @@ public:
 		{
 			commandBuffer[i] = i;
 		}
+		commandBuffer[0] = 99;
 	}
 
 	bool Execute() override
@@ -138,8 +139,6 @@ public:
 			uint clockBeforeReady = 0;
 			while (!myCore->anOutReady)
 			{ 
-				Tick();
-				clockBeforeReady++;
 
 				myCore->anExecute = 0;
 
@@ -147,6 +146,9 @@ public:
 				{
 					myCore->aMemoryData = commandBuffer[myCore->anOutMemoryAddr];
 				}
+				
+				Tick();
+				clockBeforeReady++;
 
 				if (clockBeforeReady > 65)
 				{
