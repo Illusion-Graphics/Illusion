@@ -1,4 +1,4 @@
-`include "IllusionDefines.sv"
+`include "Defines.svh"
 
 module CommandProcessor
 (

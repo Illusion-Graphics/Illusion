@@ -1,5 +1,5 @@
-`ifndef __DEFINES_SV
-`define __DEFINES_SV
+`ifndef __DEFINES_SVH
+`define __DEFINES_SVH
 
 // Width of the main memory bus address line
 localparam MAIN_MEMORY_BUS_ADDR_WIDTH = 64;
@@ -15,4 +15,4 @@ typedef enum [15:0] {
 } CommandOperands;
 
  
-`endif // __DEFINES_SV
+`endif // __DEFINES_SVH

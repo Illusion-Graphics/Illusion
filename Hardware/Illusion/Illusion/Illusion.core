@@ -4,17 +4,16 @@ name: Illusion:Illusion:Illusion:1.2
 description: Top level file for the Illusion GPU
 
 filesets:
-  defines:
+  includes:
     files:
-      - IllusionDefines.sv : {file_type : systemVerilogSource, is_include_file: true}
+      - includes/Defines.svh : {file_type : systemVerilogSource, is_include_file: true}
+      - includes/Types.svh : {file_type : systemVerilogSource, is_include_file: true}
 
   rtl:
     depend:
-      - ">=Illusion:Illusion:Rasterizer:1.0"
       - ">=Illusion:System:Memory:1.1"
     files:
       - Illusion.sv : {file_type : systemVerilogSource}
-      - TriangleAABB.sv : {file_type : systemVerilogSource}
 
   command_fetcher:
     depend:
@@ -35,16 +34,22 @@ filesets:
       - ">=Illusion:Tests:Tests:1.0"
     files:
       - Tests/CommandProcessor/CommandProcessor.cpp  : {file_type : cppSource}
+
+  rasterizer:
+    files:
+      - Rasterizer/Rasterizer.sv : {file_type : systemVerilogSource}
+      - Rasterizer/TriangleAABB.sv : {file_type : systemVerilogSource}
+    
       
   
       
 targets:
   default:
-    filesets: [defines, rtl, command_processor, command_fetcher]
+    filesets: [includes, rtl, command_processor, command_fetcher, rasterizer]
 
   sim_command_fetcher:
     default_tool: verilator
-    filesets: [defines, command_fetcher, test_command_fetcher]
+    filesets: [includes, command_fetcher, test_command_fetcher]
     toplevel: [CommandFetcher]
     tools:
       verilator:
@@ -53,7 +58,7 @@ targets:
           - "--trace"
   sim_command_processor:
     default_tool: verilator
-    filesets: [defines, command_processor, command_fetcher, test_command_processor]
+    filesets: [includes, command_processor, command_fetcher, test_command_processor]
     toplevel: [CommandProcessor]
     tools:
       verilator:
