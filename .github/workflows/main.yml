@@ -36,7 +36,7 @@ jobs:
     - name: Floating point core
       run: |
         cd Hardware
-       fusesoc run --target=fp_core Illusion:Illusion:FPCore:0.1
+        fusesoc run --target=fp_core Illusion:Illusion:FPCore:0.1
 
     - name: Simulate Top
       run: |
