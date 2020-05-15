@@ -1,0 +1,33 @@
+CAPI=2:
+
+name: Illusion:Illusion:FPCore:0.1
+description: IEEE-754 fixed point floating point unit
+
+filesets:
+  rtl:
+    files:
+      - FPCore.sv : {file_type : systemVerilogSource}
+      - IntToFloat32.sv : {file_type : systemVerilogSource}
+      - Float32ToInt.sv : {file_type : systemVerilogSource}
+      - Types.svh : {file_type : systemVerilogSource, is_include_file: true}
+      - Defines.svh : {file_type : systemVerilogSource, is_include_file: true}
+
+  fp_core_test:
+    depend:
+      - ">=Illusion:Tests:Tests:1.0"
+    files:
+      - Tests/FPCore.cpp  : {file_type : cppSource}
+
+targets:
+  default:
+    filesets: [rtl]
+
+  fp_core:
+    default_tool: verilator
+    filesets: [rtl, fp_core_test]
+    toplevel: [FPCore]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - "--trace"
