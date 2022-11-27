@@ -1,0 +1,27 @@
+CAPI=2:
+
+name: Illusion:Communication:Bridge:1.0
+description: The bridge is the interface with the outside world
+
+filesets:
+  rtl:
+    files:
+      - Bridge.sv : {file_type : systemVerilogSource}
+  
+  test:
+    files:
+      - Test/Bridge.cpp  : {file_type : cppSource}
+      
+targets:
+  default:
+    filesets: [rtl]
+
+  sim:
+    default_tool: verilator
+    filesets: [rtl, test]
+    toplevel: [Bridge]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - "--trace"

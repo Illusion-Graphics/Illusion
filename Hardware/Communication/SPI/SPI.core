@@ -1,0 +1,27 @@
+CAPI=2:
+
+name: Illusion:Communication:SPI:1.0
+description: SPI interface with the outside
+
+filesets:
+  rtl:
+    files:
+      - SPI.sv : {file_type : systemVerilogSource}
+  
+  test:
+    files:
+      - Test/SPI.cpp  : {file_type : cppSource}
+      
+targets:
+  default:
+    filesets: [rtl]
+
+  sim:
+    default_tool: verilator
+    filesets: [rtl, test]
+    toplevel: [SPI]
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - "--trace"

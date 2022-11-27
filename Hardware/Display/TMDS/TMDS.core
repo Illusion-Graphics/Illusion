@@ -1,0 +1,14 @@
+CAPI=2:
+
+name: Illusion:Display:TMDS:1.0
+description: Video signal generator
+
+filesets:
+  rtl:
+    files:
+      - TMDS.sv : {file_type : systemVerilogSource}
+      
+targets:
+  default:
+    filesets: [rtl]
+    toplevel: [TMDS_ENCODE]

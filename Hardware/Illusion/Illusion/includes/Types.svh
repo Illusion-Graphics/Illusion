@@ -3,13 +3,17 @@
 
 typedef struct packed
 {
-	// Triangle AABB in screen space
-	logic signed [10:0] minX;
-	logic signed [10:0] minY;
-	
-	logic signed [10:0] maxX;
-	logic signed [10:0] maxY;
-} TriangleData;
+	logic signed [15:0] X;
+	logic signed [15:0] Y;
+} Point;
+`define PointBlockSize $bits(Point) / 32
 
+typedef struct packed
+{
+	// Triangle AABB in screen space
+	Point min;
+	Point max;
+} TriangleData;
+`define TriangleDataBlockSize $bits(TriangleData) / 32
 
 `endif // __TYPES_SVH

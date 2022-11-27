@@ -1,0 +1,33 @@
+CAPI=2:
+
+name: Illusion:Platform:MKRVidor4000:1.0
+description: Platform top level file for the Arduino MKR Vidor 4000
+
+filesets:
+  rtl:
+    depend:
+      - ">=Illusion:System:Top:1.0"
+      - ">=Illusion:Display:TMDS:1.0"
+    files:
+      - MKRVidor4000.sv : {file_type : systemVerilogSource}
+      - DVI_OUT.v : {file_type : verilogSource}
+
+  system_pll:
+    files:
+      - SYSTEM_PLL/SYSTEM_PLL.v : {file_type : verilogSource}
+      - SYSTEM_PLL/SYSTEM_PLL.qip : {file_type : QIP}
+
+  constraints:
+    files:
+      - constraints/MKRVidor4000.sdc : {file_type : SDC}
+      - constraints/MKRVidor4000.qsf : {file_type : QSF}
+
+targets:
+  default:
+    default_tool : quartus
+    filesets : [rtl, system_pll, constraints]
+    tools:
+      quartus:
+        family : Cyclone 10 LP
+        device : 10CL016YU256C8G
+    toplevel: MKRVidor4000

@@ -1,65 +1,40 @@
 CAPI=2:
 
-name: Illusion:Illusion:Illusion:1.2
+name: Illusion:Illusion:Illusion:2.0
 description: Top level file for the Illusion GPU
 
 filesets:
-  includes:
-    files:
-      - includes/Defines.svh : {file_type : systemVerilogSource, is_include_file: true}
-      - includes/Types.svh : {file_type : systemVerilogSource, is_include_file: true}
-
   rtl:
     depend:
       - ">=Illusion:System:Memory:1.1"
     files:
       - Illusion.sv : {file_type : systemVerilogSource}
-
-  command_fetcher:
-    depend:
-      - ">=Illusion:System:Memory:1.1"
-    files:
-      - CommandProcessor/CommandFetcher.sv : {file_type : systemVerilogSource}
-  test_command_fetcher:
-    depend:
-      - ">=Illusion:Tests:Tests:1.0"
-    files:
-      - Tests/CommandProcessor/CommandFetcher.cpp  : {file_type : cppSource}
-
-  command_processor:
-    files:
-      - CommandProcessor/CommandProcessor.sv : {file_type : systemVerilogSource}
-  test_command_processor:
-    depend:
-      - ">=Illusion:Tests:Tests:1.0"
-    files:
-      - Tests/CommandProcessor/CommandProcessor.cpp  : {file_type : cppSource}
-
-  rasterizer:
-    files:
-      - Rasterizer/Rasterizer.sv : {file_type : systemVerilogSource}
-      - Rasterizer/TriangleAABB.sv : {file_type : systemVerilogSource}
     
+  includes:
+    files:
+      - Includes/Types.svh : {file_type : systemVerilogSource, is_include_file: true}
+
+  primitive_unit:
+    files:
+      - PrimitiveUnit/PrimitiveUnit.sv : {file_type : systemVerilogSource}
+      - PrimitiveUnit/TriangleAABB.sv : {file_type : systemVerilogSource}
+  primitive_unit_tests:
+    depend:
+      - ">=Illusion:Tests:Tests:1.0"
+    files:
+      - Tests/PrimitiveUnit.cpp : {file_type : cppSource}
+
       
   
       
 targets:
   default:
-    filesets: [includes, rtl, command_processor, command_fetcher, rasterizer]
+    filesets: [rtl]
 
-  sim_command_fetcher:
+  primitive_unit_tests:
     default_tool: verilator
-    filesets: [includes, command_fetcher, test_command_fetcher]
-    toplevel: [CommandFetcher]
-    tools:
-      verilator:
-        mode: cc
-        verilator_options:
-          - "--trace"
-  sim_command_processor:
-    default_tool: verilator
-    filesets: [includes, command_processor, command_fetcher, test_command_processor]
-    toplevel: [CommandProcessor]
+    filesets: [includes, primitive_unit, primitive_unit_tests]
+    toplevel: [PrimitiveUnit]
     tools:
       verilator:
         mode: cc

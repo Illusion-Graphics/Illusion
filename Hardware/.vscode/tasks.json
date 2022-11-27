@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "fusesoc",
+			"core": "::yourcore:1.0",
+			"target": "default",
+			"problemMatcher": [],
+			"label": "fusesoc: ::yourcore:1.0 - default"
+		}
+	]
+}
